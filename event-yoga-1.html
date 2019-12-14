@@ -1,0 +1,46 @@
+<div class="cd-schedule-modal__event-info">
+	<div>
+		<div>{{this.courseInfo.courseDescription}}
+		</div>
+		<div style="margin-top:10px">
+			<div v-if="this.courseInfo.meetings.instructors !== '">
+				<strong>Instructor:</strong>
+				<span>{{this.allTeacher}}</span>
+			</div>
+			<div v-if="this.pr"><strong>Prerequisites:</strong> {{this.pr}}</div>
+			<div v-if="this.co"><strong>corequisite: </strong>{{this.co}}</div>
+			<div v-if="this.ex"><strong>Exclusions: </strong>{{this.ex}}</div>
+		</div>
+		<div class="LEC">
+			<label><strong>Lecture: </strong></label>
+			<button class="sectionButton">TUT0101</button>
+			<button class="sectionButton selected">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+		</div>
+		<div class="TUT">
+			<label><strong>Tutorial: </strong></label>
+
+			<button class="sectionButton selected conflict">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+
+		</div>
+		<div class="PRA">
+			<label><strong>Practice: </strong></label>
+
+			<button class="sectionButton conflict">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+			<button class="sectionButton">TUT0101</button>
+
+		</div>
+	</div>
+
+</div>

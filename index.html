@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>document.getElementsByTagName("html")[0].className += " js";</script>
+  <link rel="stylesheet" href="assets/css/style.css">
+
+
+  <title>Schedule Template | CodyHouse</title>
+</head>
+<body>
+
+  <div class="cd-schedule margin-top-lg margin-bottom-lg js-cd-schedule single-timetable">
+    <div class="cd-schedule__timeline">
+      <ul class="timetable">
+        <timetable v-for="time in times" :time="time"></timetable>
+      </ul>
+    </div>
+    <div class="cd-schedule__events">
+      <ul >
+        <day v-for="(day, i) in days" :day="day" :semester="'fall'" :dayshort='daysshort[i]' :section-today="sectionByDay['fall'][daysshort[i]]"></day>
+      </ul>
+    </div>
+  
+    <modal :course-section="currentModal"></modal>
+
+    <div class="cd-schedule__cover-layer"></div>
+  </div> <!-- .cd-schedule -->
+
+  <script src="assets/js/conflict_handler.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="assets/js/vue.js"></script>
+  <script src="assets/js/util.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
