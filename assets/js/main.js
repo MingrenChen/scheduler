@@ -108,12 +108,12 @@ let log = console.log;
 		this.animating = true;
 
 		//update event name and time
-		// this.modalEventName.textContent = target.getElementsByTagName('em')[0].textContent;
-		// this.modalDate.textContent = target.getAttribute('data-start')+' - '+target.getAttribute('data-end');
-		// this.modal.setAttribute('data-event', target.getAttribute('data-event'));
+		this.modalEventName.textContent = target.getElementsByTagName('em')[0].textContent;
+		this.modalDate.textContent = target.getAttribute('data-start')+' - '+target.getAttribute('data-end');
+		this.modal.setAttribute('data-event', target.getAttribute('data-event'));
 
-		//update event content
-		// this.loadEventContent(target.getAttribute('data-content'));
+		// update event content
+		this.loadEventContent(target.getAttribute('data-content'));
 
 		Util.addClass(this.modal, 'cd-schedule-modal--open');
 
@@ -169,70 +169,68 @@ let log = console.log;
 		this.animationFallback();
 	};
 
-	ScheduleTemplate.prototype.closeModal = function() {
-		var self = this;
-		var mq = self.mq();
+	var self = this;
+	var mq = self.mq();
 
-		var item = self.element.getElementsByClassName('cd-schedule__event--selected')[0],
-			target = item.getElementsByTagName('a')[0];
+	var item = self.element.getElementsByClassName('cd-schedule__event--selected')[0],
+		target = item.getElementsByTagName('a')[0];
 
-		this.animating = true;
+	this.animating = true;
 
-		if( mq == 'mobile' ) {
-			Util.removeClass(this.modal, 'cd-schedule-modal--open');
-			self.modal.addEventListener('transitionend', function cb(){
-				Util.removeClass(self.modal, 'cd-schedule-modal--content-loaded');
-				Util.removeClass(item, 'cd-schedule__event--selected');
-				self.animating = false;
-				self.modal.removeEventListener('transitionend', cb);
-			});
-		} else {
-			var eventPosition = target.getBoundingClientRect(),
-				eventTop = eventPosition.top,
-				eventLeft = eventPosition.left,
-				eventHeight = target.offsetHeight,
-				eventWidth = target.offsetWidth;
+	if( mq == 'mobile' ) {
+		Util.removeClass(this.modal, 'cd-schedule-modal--open');
+		self.modal.addEventListener('transitionend', function cb(){
+			Util.removeClass(self.modal, 'cd-schedule-modal--content-loaded');
+			Util.removeClass(item, 'cd-schedule__event--selected');
+			self.animating = false;
+			self.modal.removeEventListener('transitionend', cb);
+		});
+	} else {
+		var eventPosition = target.getBoundingClientRect(),
+			eventTop = eventPosition.top,
+			eventLeft = eventPosition.left,
+			eventHeight = target.offsetHeight,
+			eventWidth = target.offsetWidth;
 
-			var modalStyle = window.getComputedStyle(self.modal),
-				modalTop = Number(modalStyle.getPropertyValue('top').replace('px', '')),
-				modalLeft = Number(modalStyle.getPropertyValue('left').replace('px', ''));
+		var modalStyle = window.getComputedStyle(self.modal),
+			modalTop = Number(modalStyle.getPropertyValue('top').replace('px', '')),
+			modalLeft = Number(modalStyle.getPropertyValue('left').replace('px', ''));
 
-			var modalTranslateX = eventLeft - modalLeft,
-				modalTranslateY = eventTop - modalTop;
+		var modalTranslateX = eventLeft - modalLeft,
+			modalTranslateY = eventTop - modalTop;
 
-			Util.removeClass(this.modal, 'cd-schedule-modal--open cd-schedule-modal--animation-completed');
+		Util.removeClass(this.modal, 'cd-schedule-modal--open cd-schedule-modal--animation-completed');
 
-			//change modal width/height and translate it
-			self.modal.style.width = eventWidth+'px';self.modal.style.height = eventHeight+'px';self.modal.style.transform = 'translateX('+modalTranslateX+'px) translateY('+modalTranslateY+'px)';
-			//scale down modalBodyBg element
-			self.modalBodyBg.style.transform = 'scaleX(0) scaleY(1)';
-			//scale down modalHeaderBg element
-			// self.modalHeaderBg.setAttribute('style', 'transform: scaleY(1)');
-			self.modalHeaderBg.style.transform = 'scaleY(1)';
+		//change modal width/height and translate it
+		self.modal.style.width = eventWidth+'px';self.modal.style.height = eventHeight+'px';self.modal.style.transform = 'translateX('+modalTranslateX+'px) translateY('+modalTranslateY+'px)';
+		//scale down modalBodyBg element
+		self.modalBodyBg.style.transform = 'scaleX(0) scaleY(1)';
+		//scale down modalHeaderBg element
+		// self.modalHeaderBg.setAttribute('style', 'transform: scaleY(1)');
+		self.modalHeaderBg.style.transform = 'scaleY(1)';
 
-			self.modalHeaderBg.addEventListener('transitionend', function cb(){
-				//wait for the  end of the modalHeaderBg transformation and reset modal style
-				Util.addClass(self.modal, 'cd-schedule-modal--no-transition');
-				setTimeout(function(){
-					self.modal.removeAttribute('style');
-					self.modalBody.removeAttribute('style');
-					self.modalHeader.removeAttribute('style');
-					self.modalHeaderBg.removeAttribute('style');
-					self.modalBodyBg.removeAttribute('style');
-				}, 10);
-				setTimeout(function(){
-					Util.removeClass(self.modal, 'cd-schedule-modal--no-transition');
-				}, 20);
-				self.animating = false;
-				Util.removeClass(self.modal, 'cd-schedule-modal--content-loaded');
-				Util.removeClass(item, 'cd-schedule__event--selected');
-				self.modalHeaderBg.removeEventListener('transitionend', cb);
-			});
-		}
+		self.modalHeaderBg.addEventListener('transitionend', function cb(){
+			//wait for the  end of the modalHeaderBg transformation and reset modal style
+			Util.addClass(self.modal, 'cd-schedule-modal--no-transition');
+			setTimeout(function(){
+				self.modal.removeAttribute('style');
+				self.modalBody.removeAttribute('style');
+				self.modalHeader.removeAttribute('style');
+				self.modalHeaderBg.removeAttribute('style');
+				self.modalBodyBg.removeAttribute('style');
+			}, 10);
+			setTimeout(function(){
+				Util.removeClass(self.modal, 'cd-schedule-modal--no-transition');
+			}, 20);
+			self.animating = false;
+			Util.removeClass(self.modal, 'cd-schedule-modal--content-loaded');
+			Util.removeClass(item, 'cd-schedule__event--selected');
+			self.modalHeaderBg.removeEventListener('transitionend', cb);
+		});
+	}
 
-		//if browser do not support transitions -> no need to wait for the end of it
-		this.animationFallback();
-	};
+	//if browser do not support transitions -> no need to wait for the end of it
+	this.animationFallback();
 
 	ScheduleTemplate.prototype.checkEventModal = function(modalOpen) {
 		// this function is used on resize to reset events/modal style

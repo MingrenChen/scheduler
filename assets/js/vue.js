@@ -1,5 +1,5 @@
 Vue.component('modal', {
-    props: ['courseSection'],
+    props: ['courseSection', 'modalClass'],
 
     computed: {
         show: function () {
@@ -9,9 +9,14 @@ Vue.component('modal', {
             if (this.courseSection) {
                 return this.courseSection.event
             }
+        },
+    },
+    methods: {
+        closeModalClick: function () {
+            this.$parent.closeModal()
         }
     },
-    template : "<div class=\"cd-schedule-modal\" :data-event='getEvent'>" +
+    template : "<div :class='this.modalClass' :data-event='getEvent'>" +
         "      <header class=\"cd-schedule-modal__header\">" +
         "        <div class=\"cd-schedule-modal__content\">{{this.show}}" +
         "          <h3 class=\"cd-schedule-modal__name\">{{this.courseSection.code}}</h3>\n" +
@@ -23,9 +28,9 @@ Vue.component('modal', {
         "        <div class=\"cd-schedule-modal__event-info\">" +
         "           <sectionselection :courses='this.courseSection'></sectionselection>" +
         "        </div>" +
-        "        <div class=\"cd-schedule-modal__body-bg\"></div>\n" +
+        "        <div class=\"cd-schedule-modal__body-bg\" ></div>\n" +
         "      </div>" +
-        "      <a href=\"#0\" class=\"cd-schedule-modal__close text-replace\">Close</a>\n" +
+        "      <a href=\"#0\" v-on:click='this.closeModalClick' class=\"cd-schedule-modal__close text-replace\">Close</a>\n" +
         "    </div>"
 })
 
@@ -72,8 +77,6 @@ Vue.component('sectionselection', {
         '</div>'
 })
 
-Vue.component('')
-
 
 Vue.component('timetable', {
     props: ['time'],
@@ -85,7 +88,8 @@ Vue.component('meeting', {
     props: ['meeting'],
     data: function(){
         return {
-            style: {}
+            style: {},
+            meetingClassList: ['cd-schedule__event']
         }
     },
     computed: {
@@ -138,9 +142,13 @@ Vue.component('meeting', {
         },
         meetingClick: function () {
             this.$parent.$parent.openModal(this.courseCode)
+            setTimeout(this.addClass, 10);
+        },
+        addClass: function () {
+            this.meetingClassList.push('cd-schedule__event--selected')
         }
     },
-    template: '<li class="cd-schedule__event" :style="getStyle" v-on:click="meetingClick">' +
+    template: '<li :class="meetingClassList" :style="getStyle" v-on:click="meetingClick">' +
         '<a :data-start="this.startTime" :data-end="this.endTime" data-content="event-yoga-1" :data-event="this.dataevent" href="#0">' +
         '<em class="cd-schedule__name">{{this.courseCode}}</em>'+
         '<em class="cd-schedule__name">{{this.courseTitle}}</em>'+
@@ -186,6 +194,7 @@ var timetable = new Vue({
         days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         daysshort: ['MO','TU','WE', "TH", "FR"],
         selections: {'VIC001Y1-Y-20199':['TUT-0101']},
+        modalClassList: ['cd-schedule-modal'],
         currentModal: {},
         courses:
             {"VIC001Y1-Y-20199": {
@@ -324,7 +333,16 @@ var timetable = new Vue({
         },
         openModal: function (courseId) {
             this.currentModal = this.getCourseInfo(courseId)
-            console.log(this.currentModal)
+            this.modalClassList.push('cd-schedule-modal--content-loaded');
+            this.modalClassList.push('cd-schedule-modal--open');
+
+            console.log(this.modalClassList)
+        },
+        closeModal: function () {
+            this.modalClassList.splice(this.modalClassList.indexOf('cd-schedule-modal--content-loaded'), 1);
+            this.modalClassList.splice(this.modalClassList.indexOf('cd-schedule__event--selected'), 1);
+            console.log(this.modalClassList)
+
         }
 
     }
