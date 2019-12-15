@@ -509,7 +509,7 @@ a {
   }
 }
 
-.cd-schedule-modal--open { // this class is added as soon as an event is selected
+.modal-enter-active { // this class is added as soon as an event is selected
 	transform: translateX(0);
 	visibility: visible;
 
@@ -527,7 +527,7 @@ a {
 		transition: opacity .2s;
 	}
 
-	.cd-schedule-modal--open .cd-schedule-modal__body-bg {
+	.modal-enter-active .cd-schedule-modal__body-bg {
 		opacity: 1;
 		transition: transform .4s;
 		transition-timing-function: cubic-bezier(.5,0,.1,1);
@@ -547,7 +547,7 @@ a {
 	transition: opacity .4s, visibility .4s;
 }
 
-.cd-schedule-modal--open + .cd-schedule__cover-layer {
+.modal-enter-active + .cd-schedule__cover-layer {
 	opacity: 1;
 	visibility: visible;
 }

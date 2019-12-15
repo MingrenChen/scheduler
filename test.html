@@ -6,28 +6,69 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="assets/js/animation.js"></script>
     <style>
-        .v-enter-active, .v-leave-active {
-            transition: opacity .5s;
+        .modal{
+            background: red;
+            width: 200px;
+            height: 200px;
+            left: 200px;
+            top: 100px;
         }
-        .v-enter, .v-leave-to /* .fade-leave-active below version 2.1.8 */ {
-            opacity: 0;
+        .modal-body {
+            background: black;
+            width: 200px;
+            height: 200px;
+        }
+        .fade-enter{
+            transform: translateX(100px) scale(0.5,1);
+            background: yellow;
+
+        }
+        .fade-enter-active{
+            transition: all 3s;
+            background: green;
+        }
+        .fade-enter-to{
+            background: black;
+        }
+        .fade2-enter{
+            transform: translateX(100px) ;
+            background: yellow;
+
+        }
+        .fade2-enter-active{
+            transition: all 3s;
+            background: green;
+        }
+        .fade2-enter-to{
+            background: black;
         }
     </style>
 </head>
 <body>
 <div id="demo">
-    <button v-on:click="show = !show">
+    <button v-on:click="move">
         Toggle
     </button>
-    <transition>
-        <p v-if="show">hello</p>
-    </transition>
+    <div style="display: flex">
+        <transition name="fade">
+            <div v-if="show" class="modal">hello</div>
+        </transition>
+        <transition name="fade2">
+            <div v-if="show" class="modal-body">hello2</div>
+        </transition>
+    </div>
+
 </div>
 <script>
     new Vue({
         el: '#demo',
         data: {
             show: true
+        },
+        methods: {
+            move: function () {
+                this.show = !this.show
+            }
         }
     })
 </script>
