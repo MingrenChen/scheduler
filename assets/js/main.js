@@ -108,19 +108,19 @@ let log = console.log;
 		this.animating = true;
 
 		//update event name and time
-		this.modalEventName.textContent = target.getElementsByTagName('em')[0].textContent;
-		this.modalDate.textContent = target.getAttribute('data-start')+' - '+target.getAttribute('data-end');
-		this.modal.setAttribute('data-event', target.getAttribute('data-event'));
+		// this.modalEventName.textContent = target.getElementsByTagName('em')[0].textContent;
+		// this.modalDate.textContent = target.getAttribute('data-start')+' - '+target.getAttribute('data-end');
+		// this.modal.setAttribute('data-event', target.getAttribute('data-event'));
 
-		// update event content
-		this.loadEventContent(target.getAttribute('data-content'));
+		//update event content
+		// this.loadEventContent(target.getAttribute('data-content'));
 
-		Util.addClass(this.modal, 'cd-schedule-modal--open');
+		// Util.addClass(this.modal, 'cd-schedule-modal--open');
 
-		setTimeout(function(){
-			//fixes a flash when an event is selected - desktop version only
-			Util.addClass(target.closest('li'), 'cd-schedule__event--selected');
-		}, 10);
+		// setTimeout(function(){
+		// 	//fixes a flash when an event is selected - desktop version only
+		// 	Util.addClass(target.closest('li'), 'cd-schedule__event--selected');
+		// }, 10);
 
 		if( mq == 'mobile' ) {
 			self.modal.addEventListener('transitionend', function cb(){
@@ -169,68 +169,70 @@ let log = console.log;
 		this.animationFallback();
 	};
 
-	var self = this;
-	var mq = self.mq();
+	ScheduleTemplate.prototype.closeModal = function() {
+		var self = this;
+		var mq = self.mq();
 
-	var item = self.element.getElementsByClassName('cd-schedule__event--selected')[0],
-		target = item.getElementsByTagName('a')[0];
+		// var item = self.element.getElementsByClassName('cd-schedule__event--selected')[0],
+		// 	target = item.getElementsByTagName('a')[0];
 
-	this.animating = true;
+		this.animating = true;
 
-	if( mq == 'mobile' ) {
-		Util.removeClass(this.modal, 'cd-schedule-modal--open');
-		self.modal.addEventListener('transitionend', function cb(){
-			Util.removeClass(self.modal, 'cd-schedule-modal--content-loaded');
-			Util.removeClass(item, 'cd-schedule__event--selected');
-			self.animating = false;
-			self.modal.removeEventListener('transitionend', cb);
-		});
-	} else {
-		var eventPosition = target.getBoundingClientRect(),
-			eventTop = eventPosition.top,
-			eventLeft = eventPosition.left,
-			eventHeight = target.offsetHeight,
-			eventWidth = target.offsetWidth;
+		if( mq == 'mobile' ) {
+			Util.removeClass(this.modal, 'cd-schedule-modal--open');
+			self.modal.addEventListener('transitionend', function cb(){
+				Util.removeClass(self.modal, 'cd-schedule-modal--content-loaded');
+				Util.removeClass(item, 'cd-schedule__event--selected');
+				self.animating = false;
+				self.modal.removeEventListener('transitionend', cb);
+			});
+		} else {
+			// var eventPosition = target.getBoundingClientRect(),
+			// 	eventTop = eventPosition.top,
+			// 	eventLeft = eventPosition.left,
+			// 	eventHeight = target.offsetHeight,
+			// 	eventWidth = target.offsetWidth;
+			//
+			// var modalStyle = window.getComputedStyle(self.modal),
+			// 	modalTop = Number(modalStyle.getPropertyValue('top').replace('px', '')),
+			// 	modalLeft = Number(modalStyle.getPropertyValue('left').replace('px', ''));
+			//
+			// var modalTranslateX = eventLeft - modalLeft,
+			// 	modalTranslateY = eventTop - modalTop;
+			//
+			// Util.removeClass(this.modal, 'cd-schedule-modal--open cd-schedule-modal--animation-completed');
+			//
+			// //change modal width/height and translate it
+			// self.modal.style.width = eventWidth+'px';self.modal.style.height = eventHeight+'px';self.modal.style.transform = 'translateX('+modalTranslateX+'px) translateY('+modalTranslateY+'px)';
+			// //scale down modalBodyBg element
+			// self.modalBodyBg.style.transform = 'scaleX(0) scaleY(1)';
+			// //scale down modalHeaderBg element
+			// // self.modalHeaderBg.setAttribute('style', 'transform: scaleY(1)');
+			// self.modalHeaderBg.style.transform = 'scaleY(1)';
+			//
+			// self.modalHeaderBg.addEventListener('transitionend', function cb(){
+			// 	//wait for the  end of the modalHeaderBg transformation and reset modal style
+			// 	Util.addClass(self.modal, 'cd-schedule-modal--no-transition');
+			// 	setTimeout(function(){
+			// 		self.modal.removeAttribute('style');
+			// 		self.modalBody.removeAttribute('style');
+			// 		self.modalHeader.removeAttribute('style');
+			// 		self.modalHeaderBg.removeAttribute('style');
+			// 		self.modalBodyBg.removeAttribute('style');
+			// 	}, 10);
+			// 	setTimeout(function(){
+			// 		Util.removeClass(self.modal, 'cd-schedule-modal--no-transition');
+			// 	}, 20);
+			// 	self.animating = false;
+			// 	// Util.removeClass(self.modal, 'cd-schedule-modal--content-loaded');
+			// 	// Util.removeClass(item, 'cd-schedule__event--selected');
+			// 	self.modalHeaderBg.removeEventListener('transitionend', cb);
+			// });
+		}
 
-		var modalStyle = window.getComputedStyle(self.modal),
-			modalTop = Number(modalStyle.getPropertyValue('top').replace('px', '')),
-			modalLeft = Number(modalStyle.getPropertyValue('left').replace('px', ''));
-
-		var modalTranslateX = eventLeft - modalLeft,
-			modalTranslateY = eventTop - modalTop;
-
-		Util.removeClass(this.modal, 'cd-schedule-modal--open cd-schedule-modal--animation-completed');
-
-		//change modal width/height and translate it
-		self.modal.style.width = eventWidth+'px';self.modal.style.height = eventHeight+'px';self.modal.style.transform = 'translateX('+modalTranslateX+'px) translateY('+modalTranslateY+'px)';
-		//scale down modalBodyBg element
-		self.modalBodyBg.style.transform = 'scaleX(0) scaleY(1)';
-		//scale down modalHeaderBg element
-		// self.modalHeaderBg.setAttribute('style', 'transform: scaleY(1)');
-		self.modalHeaderBg.style.transform = 'scaleY(1)';
-
-		self.modalHeaderBg.addEventListener('transitionend', function cb(){
-			//wait for the  end of the modalHeaderBg transformation and reset modal style
-			Util.addClass(self.modal, 'cd-schedule-modal--no-transition');
-			setTimeout(function(){
-				self.modal.removeAttribute('style');
-				self.modalBody.removeAttribute('style');
-				self.modalHeader.removeAttribute('style');
-				self.modalHeaderBg.removeAttribute('style');
-				self.modalBodyBg.removeAttribute('style');
-			}, 10);
-			setTimeout(function(){
-				Util.removeClass(self.modal, 'cd-schedule-modal--no-transition');
-			}, 20);
-			self.animating = false;
-			Util.removeClass(self.modal, 'cd-schedule-modal--content-loaded');
-			Util.removeClass(item, 'cd-schedule__event--selected');
-			self.modalHeaderBg.removeEventListener('transitionend', cb);
-		});
-	}
-
-	//if browser do not support transitions -> no need to wait for the end of it
-	this.animationFallback();
+		//if browser do not support transitions -> no need to wait for the end of it
+		this.animationFallback();
+	};
 
 	ScheduleTemplate.prototype.checkEventModal = function(modalOpen) {
 		// this function is used on resize to reset events/modal style
@@ -287,28 +289,6 @@ let log = console.log;
 		}
 	};
 
-	ScheduleTemplate.prototype.loadEventContent = function(content) {
-		// load the content of an event when user selects it
-		var self = this;
-		httpRequest = new XMLHttpRequest();
-		httpRequest.onreadystatechange = function() {
-			if (httpRequest.readyState === XMLHttpRequest.DONE) {
-	      if (httpRequest.status === 200) {
-	      	self.modal.getElementsByClassName('cd-schedule-modal__event-info')[0].innerHTML = self.getEventContent(httpRequest.responseText);
-	      	Util.addClass(self.modal, 'cd-schedule-modal--content-loaded');
-	      }
-	    }
-		};
-		httpRequest.open('GET', content+'.html');
-    httpRequest.send();
-	};
-
-	ScheduleTemplate.prototype.getEventContent = function(string) {
-		// reset the loaded event content so that it can be inserted in the modal
-		var div = document.createElement('div');
-		div.innerHTML = string.trim();
-		return div.getElementsByClassName('cd-schedule-modal__event-info')[0].innerHTML;
-	};
 
 	ScheduleTemplate.prototype.animationFallback = function() {
 		if( !this.supportAnimation ) { // fallback for browsers not supporting transitions

@@ -142,10 +142,10 @@ Vue.component('meeting', {
         },
         meetingClick: function () {
             this.$parent.$parent.openModal(this.courseCode)
-            setTimeout(this.addClass, 10);
+            this.$parent.$parent.selectedMeeting = this
         },
-        addClass: function () {
-            this.meetingClassList.push('cd-schedule__event--selected')
+        removeEventSelectedClass: function () {
+            this.meetingClassList.splice(this.meetingClassList.indexOf('cd-schedule__event--selected'), 1);
         }
     },
     template: '<li :class="meetingClassList" :style="getStyle" v-on:click="meetingClick">' +
@@ -195,6 +195,7 @@ var timetable = new Vue({
         daysshort: ['MO','TU','WE', "TH", "FR"],
         selections: {'VIC001Y1-Y-20199':['TUT-0101']},
         modalClassList: ['cd-schedule-modal'],
+        selectedMeeting: undefined,
         currentModal: {},
         courses:
             {"VIC001Y1-Y-20199": {
@@ -332,19 +333,27 @@ var timetable = new Vue({
             return course
         },
         openModal: function (courseId) {
-            this.currentModal = this.getCourseInfo(courseId)
-            this.modalClassList.push('cd-schedule-modal--content-loaded');
+            this.currentModal = this.getCourseInfo(courseId);
+            // cd-schedule__event--selected add when an user select the event
+            setTimeout(this.addClassEventSelect, 10);
+            // cd-schedule-modal--open add when event been selected
             this.modalClassList.push('cd-schedule-modal--open');
 
-            console.log(this.modalClassList)
+
+
+            this.modalClassList.push('cd-schedule-modal--content-loaded');
+            this.modalClassList.push('cd-schedule-modal--animation-completed')
         },
         closeModal: function () {
             this.modalClassList.splice(this.modalClassList.indexOf('cd-schedule-modal--content-loaded'), 1);
             this.modalClassList.splice(this.modalClassList.indexOf('cd-schedule__event--selected'), 1);
-            console.log(this.modalClassList)
-
+            this.modalClassList.splice(this.modalClassList.indexOf('cd-schedule-modal--animation-completed'), 1);
+            this.selectedMeeting.removeEventSelectedClass()
+            this.selectedMeeting = undefined
+        },
+        addClassEventSelect: function () {
+            this.selectedMeeting.meetingClassList.push('cd-schedule__event--selected');
         }
-
     }
 });
 

@@ -25,13 +25,13 @@
   
     <modal :course-section="currentModal" :class="this.modalClassList"></modal>
 
-    <div class="cd-schedule__cover-layer"></div>
+    <div class="cd-schedule__cover-layer" v-on:click="closeModal"></div>
   </div> <!-- .cd-schedule -->
 
   <script src="assets/js/conflict_handler.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="assets/js/vue.js"></script>
   <script src="assets/js/util.js"></script>
-  <script src="assets/js/main.js"></script>
+<!--  <script src="assets/js/main.js"></script>-->
 </body>
 </html>
