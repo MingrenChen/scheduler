@@ -24,10 +24,10 @@
         <day v-for="(day, i) in days" :day="day" :semester="'fall'" :dayshort='daysshort[i]' :section-today="sectionByDay['fall'][daysshort[i]]"></day>
       </ul>
     </div>
-      <modal :course-section="modalState.currentModalEvent"
-             :class="{'cd-schedule-modal': true, 'cd-schedule-modal__opening': this.modalIsOpening,
-             'cd-schedule-modal__closing': this.modalIsClosing}" ></modal>
-    <transition name="cover">
+      <modal :course="modalState.currentModalEvent"
+             :class="{'cd-schedule-modal': true, 'cd-schedule-modal__opening': this.modalState.modalIsOpening,
+             'cd-schedule-modal__closing': this.modalState.modalIsClosing}" ></modal>
+    <transition name="cover" >
       <div v-if="this.modalState.selectedMeeting !== undefined" class="cd-schedule__cover-layer" v-on:click="closeModal"></div>
     </transition>
   </div> <!-- .cd-schedule -->
