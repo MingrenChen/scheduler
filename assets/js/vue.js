@@ -385,6 +385,14 @@ var timetable = new Vue({
                                     "meetingScheduleId": "163117",
                                     "assignedRoom1": "",
                                     "assignedRoom2": ""
+                                },
+                                "TU-167668": {
+                                    "meetingDay": "TU",
+                                    "meetingStartTime": "12:00",
+                                    "meetingEndTime": "14:00",
+                                    "meetingScheduleId": "167668",
+                                    "assignedRoom1": "",
+                                    "assignedRoom2": ""
                                 }
                             },
                             "instructors": ['b'],
@@ -409,14 +417,7 @@ var timetable = new Vue({
                                     "assignedRoom1": "",
                                     "assignedRoom2": ""
                                 },
-                                "TU-167668": {
-                                    "meetingDay": "TU",
-                                    "meetingStartTime": "12:00",
-                                    "meetingEndTime": "14:00",
-                                    "meetingScheduleId": "167668",
-                                    "assignedRoom1": "",
-                                    "assignedRoom2": ""
-                                }
+
                             },
                             "instructors": ['a'],
                             "teachingMethod": "TUT",
@@ -487,9 +488,6 @@ var timetable = new Vue({
             }
             return result
         },
-        hasSelectedMeeting: function () {
-            return this.modalState.selectedMeeting !== undefined;
-        }
 
     },
     methods: {
@@ -537,10 +535,7 @@ var timetable = new Vue({
         },
         unSelectSection: function (courseID, sectionID) {
             this.selections[courseID] = this.selections[courseID].filter(e => e !== sectionID)
-            console.log(this.selections[courseID])
         }
-
-
     }
 });
 
