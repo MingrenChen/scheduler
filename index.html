@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script>document.getElementsByTagName("html")[0].className += " js";</script>
+    <script src="node_modules/gsap/dist/gsap.min.js"></script>
+
+    <script>document.getElementsByTagName("html")[0].className += " js";</script>
   <link rel="stylesheet" href="assets/css/style.css">
 
 
@@ -22,14 +24,16 @@
         <day v-for="(day, i) in days" :day="day" :semester="'fall'" :dayshort='daysshort[i]' :section-today="sectionByDay['fall'][daysshort[i]]"></day>
       </ul>
     </div>
-    <transition name="modal">
-      <modal v-if="hasSelectedMeeting" :course-section="currentModal" :class="this.modalClassList"></modal>
+      <modal :course-section="modalState.currentModalEvent"
+             :class="{'cd-schedule-modal': true, 'cd-schedule-modal__opening': this.modalIsOpening,
+             'cd-schedule-modal__closing': this.modalIsClosing}" ></modal>
+    <transition name="cover">
+      <div v-if="this.modalState.selectedMeeting !== undefined" class="cd-schedule__cover-layer" v-on:click="closeModal"></div>
     </transition>
-
-    <div class="cd-schedule__cover-layer" v-on:click="closeModal"></div>
   </div> <!-- .cd-schedule -->
 
   <script src="assets/js/conflict_handler.js"></script>
+  <script src="assets/js/animation.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="assets/js/vue.js"></script>
   <script src="assets/js/util.js"></script>

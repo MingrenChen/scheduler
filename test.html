@@ -3,76 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="assets/js/animation.js"></script>
+
     <style>
-        .modal{
-            background: red;
-            width: 200px;
-            height: 200px;
-            left: 200px;
-            top: 100px;
+        .cd-schedule-modal{
+            display: flex;
+            position: absolute;
+            z-index: 3;
+            visibility: visible;
+            width: 800px;
+            height: 480px;
+            left: 241.5px;
+            top: 198.4px;
         }
-        .modal-body {
-            background: black;
-            width: 200px;
-            height: 200px;
+        .cd-schedule-modal__header {
+            background: orange;
+            display: flex;
         }
-        .fade-enter{
-            transform: translateX(100px) scale(0.5,1);
-            background: yellow;
+        .cd-schedule-modal__code {
+            text-align: center;
+        }
+        .cd-schedule-modal__content {
+            margin: 10px;
+            align-content: center;
+            color: white;
+        }
 
-        }
-        .fade-enter-active{
-            transition: all 3s;
-            background: green;
-        }
-        .fade-enter-to{
-            background: black;
-        }
-        .fade2-enter{
-            transform: translateX(100px) ;
-            background: yellow;
-
-        }
-        .fade2-enter-active{
-            transition: all 3s;
-            background: green;
-        }
-        .fade2-enter-to{
-            background: black;
-        }
     </style>
 </head>
 <body>
-<div id="demo">
-    <button v-on:click="move">
-        Toggle
-    </button>
-    <div style="display: flex">
-        <transition name="fade">
-            <div v-if="show" class="modal">hello</div>
-        </transition>
-        <transition name="fade2">
-            <div v-if="show" class="modal-body">hello2</div>
-        </transition>
+    <div class="cd-schedule-modal">
+        <header class="cd-schedule-modal__header">
+            <div class="cd-schedule-modal__content">
+                <span class="cd-schedule-modal__date">09:30 - 10:30</span>
+                <h3 class="cd-schedule-modal__name">CSC411</h3>
+                <h4 class="cd-schedule-modal__name">Data Structor and Machine leaning</h4>
+            </div>
+            <div class="cd-schedule-modal__header-bg"></div>
+        </header>
+
+        <div class="cd-schedule-modal__event-info">
+            <div>
+                <div>{{this.courseInfo.courseDescription}}
+                </div>
+                <div style="margin-top:10px">
+                    <div v-if="this.courseInfo.meetings.instructors !== '">
+                        <strong>Instructor:</strong>
+                        <span>{{this.allTeacher}}</span>
+                    </div>
+                    <div v-if="this.pr"><strong>Prerequisites:</strong> {{this.pr}}</div>
+                    <div v-if="this.co"><strong>corequisite: </strong>{{this.co}}</div>
+                    <div v-if="this.ex"><strong>Exclusions: </strong>{{this.ex}}</div>
+                </div>
+                <div class="LEC">
+                    <label><strong>Lecture: </strong></label>
+                    <button class="sectionButton">TUT0101</button>
+                    <button class="sectionButton selected">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+                </div>
+                <div class="TUT">
+                    <label><strong>Tutorial: </strong></label>
+
+                    <button class="sectionButton selected conflict">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+
+                </div>
+                <div class="PRA">
+                    <label><strong>Practice: </strong></label>
+
+                    <button class="sectionButton conflict">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+                    <button class="sectionButton">TUT0101</button>
+
+                </div>
+            </div>
+
+        </div>
     </div>
 
-</div>
-<script>
-    new Vue({
-        el: '#demo',
-        data: {
-            show: true
-        },
-        methods: {
-            move: function () {
-                this.show = !this.show
-            }
-        }
-    })
-</script>
 
 
 </body>
+<script src="node_modules/gsap/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="assets/js/animation.js"></script>
 </html>

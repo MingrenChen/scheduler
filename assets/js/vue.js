@@ -1,9 +1,57 @@
 Vue.component('modal', {
-    props: ['courseSection', 'modalClass'],
+    props: ['courseSection', 'isOpening'],
+    data: function(){
+        return {
+            style : {
+                "position": "absolute",
+                "z-index": 3,
+                'display': 'inline-flex',
+                "visibility": "hidden",
+            },
+            headerAnimationComplete: false,
+            headerStyle: {
+                width: 0
+            }
+        }
+    },
+    // create a observer for class change
+    mounted() {
+        this.observer = new MutationObserver(mutations => {
+            for (const m of mutations) {
+                const newValue = m.target.getAttribute(m.attributeName);
+                this.$nextTick(() => {
+                    this.onClassChange(newValue, m.oldValue);
+                });
+            }
+        });
 
+        this.observer.observe(this.$refs.modal, {
+            attributes: true,
+            attributeOldValue : true,
+            attributeFilter: ['class'],
+        });
+
+    },
+
+    beforeDestroy() {
+        this.observer.disconnect();
+    },
     computed: {
-        show: function () {
-            // console.log(this.courseSection)
+        getStyle: function(){
+            if (!this.style) {
+                return {}
+            }
+            let style = this.style;
+            let window = this.$parent.window;
+            let modalWidth = (window.width *.8 > 800 ) ? 800 : window.width *.8;
+            let modalHeight = ( window.height *.8 > 480 ) ? 480 : windoww.height *.8;
+            let modalLeft = (window.width - modalWidth)/2;
+            let modalTop = (window.height - modalHeight)/2.5;
+            style.width = modalWidth + 'px'
+            style.height = modalHeight + 'px'
+            style.left = modalLeft + 'px'
+            style.top = modalTop + 'px'
+            return style
         },
         getEvent: function () {
             if (this.courseSection) {
@@ -14,39 +62,80 @@ Vue.component('modal', {
     methods: {
         closeModalClick: function () {
             this.$parent.closeModal()
+        },
+        onClassChange: function(classAttrValue) {
+            const classList = classAttrValue.split(' ');
+            if (classList.includes('cd-schedule-modal__opening')){
+                this.modalOpenAnimate()
+            }
+        },
+        modalShowEventDetail: function () {
+            this.headerAnimationComplete = true
+        },
+        modalOpenAnimate: function () {
+            // get meeting block's rectangle
+            let meetingRec = this.$parent.modalState.selectedMeeting.$el.getBoundingClientRect();
+
+            // get modal header's rec, header is the left column of modal
+            let modalHeaderRec = this.$refs.header.getBoundingClientRect();
+            // get width of the whole modal, we want to set header column 20% of modal
+            let width = parseInt(this.getStyle.width.slice(0, this.getStyle.width.length-2))
+            this.headerStyle.width = width * 0.2+'px'
+            // make the modal visible
+            this.style.visibility= 'visible';
+            // input to myEle is the final location of modal header.
+            let myele = new myEle(modalHeaderRec.left, modalHeaderRec.top, width * 0.2, modalHeaderRec.height);
+            let transition_header__bg =
+                myele.styleMoveAndScaleFrom(meetingRec.left, meetingRec.top, meetingRec.width, meetingRec.height, 0.5);
+            // add a call back function here on complete
+            transition_header__bg.onComplete = this.modalShowEventDetail
+            gsap.from('.cd-schedule-modal__opening .cd-schedule-modal__header-bg', transition_header__bg);
+
+            // header content are only for course code and title part of header
+            let transition_header__content =
+                myele.styleMoveFrom(meetingRec.left, meetingRec.top, 0.5)
+            gsap.from('.cd-schedule-modal__opening .cd-schedule-modal__content', transition_header__content);
+        },
+        modalCloseAnimate: function () {
+            this.headerAnimationComplete = false
         }
+
+
     },
-    template : "<div :class='this.modalClass' :data-event='getEvent'>" +
-        "      <header class=\"cd-schedule-modal__header\">" +
-        "        <div class=\"cd-schedule-modal__content\">{{this.show}}" +
-        "          <h3 class=\"cd-schedule-modal__name\">{{this.courseSection.code}}</h3>\n" +
-        "          <h4 class=\"cd-schedule-modal__name\">{{this.courseSection.courseTitle}}</h4>\n" +
+    template : "<div ref=\"modal\" :data-event='getEvent' :style='this.getStyle'>" +
+        "       <div class=\"cd-schedule-modal__header\" :style='this.headerStyle' ref='header'>" +
+        "        <div class=\"cd-schedule-modal__content\" :style='this.headerStyle'>{{this.show}}" +
+        "           <span class=\"cd-schedule-modal__date\">10:00 - 13:00</span>" +
+        "           <h3 class=\"cd-schedule-modal__name\">{{this.courseSection.code}}</h3>" +
+        "           <h4 class=\"cd-schedule-modal__name\">{{this.courseSection.courseTitle}}</h4>" +
         "        </div>" +
-        "        <div class=\"cd-schedule-modal__header-bg\"></div>\n" +
-        "      </header>" +
-        "      <div class=\"cd-schedule-modal__body\">\n" +
-        "        <div class=\"cd-schedule-modal__event-info\">" +
-        "           <sectionselection :courses='this.courseSection'></sectionselection>" +
-        "        </div>" +
-        "        <div class=\"cd-schedule-modal__body-bg\" ></div>\n" +
-        "      </div>" +
+        "        <div class=\"cd-schedule-modal__header-bg\" :style='this.headerStyle'></div>" +
+        "       </div>" +
+        "       <transition name='modal-body'>" +
+            "       <div v-if='headerAnimationComplete' class=\"cd-schedule-modal__body\">" +
+            "        <div class=\"cd-schedule-modal__event-info\">" +
+            "           <sectionselection :courses='this.courseSection'></sectionselection>" +
+            "        </div>" +
+            "        <div class=\"cd-schedule-modal__body-bg\"></div>" +
+            "      </div>" +
+        "       </transition>" +
         "      <a href=\"#0\" v-on:click='this.closeModalClick' class=\"cd-schedule-modal__close text-replace\">Close</a>\n" +
         "    </div>"
-})
+});
 
 
 Vue.component('sectionselection', {
     props: ['courses'],
     computed: {
         allTeachers: function () {
-            let result = ''
+            let result = '';
             if (Object.keys(this.courses).includes('allmeetings')){
                 Object.keys(this.courses.allmeetings).forEach(keys => {
                     let meeting = this.courses.allmeetings[keys];
                     meeting.instructors.forEach(instructor => {
                         result += (instructor + '(' + keys +'), ')
                     })
-                })
+                });
                 return result.slice(0,result.length-2)
             }
 
@@ -75,7 +164,7 @@ Vue.component('sectionselection', {
                 '</div>'+
             '</div>'+
         '</div>'
-})
+});
 
 
 Vue.component('timetable', {
@@ -88,7 +177,8 @@ Vue.component('meeting', {
     props: ['meeting'],
     data: function(){
         return {
-            style: {},
+            selected: false,
+            style: {visibility: 'visible'},
             meetingClassList: ['cd-schedule__event']
         }
     },
@@ -110,6 +200,7 @@ Vue.component('meeting', {
                 return this.style
             }
         },
+
         dataevent: function () {
             return this.meeting.event
         }
@@ -118,21 +209,22 @@ Vue.component('meeting', {
     mounted: function () {
         let duration = this.getScheduleTimestamp(this.endTime) - this.getScheduleTimestamp(this.startTime);
         let timelineStart = this.getScheduleTimestamp('9:00');
-        let start = this.getScheduleTimestamp(this.startTime)
+        let start = this.getScheduleTimestamp(this.startTime);
         let timelineUnitDuration = this.getScheduleTimestamp('10:00') - timelineStart;
         let slotHeight = this.$parent.$refs.header.offsetHeight;
         let eventTop = slotHeight*(start - timelineStart)/timelineUnitDuration - 1 + 'px';
         let eventHeight = slotHeight*duration/timelineUnitDuration + 1 + 'px';
-
-        let slotWidth = this.$parent.$refs.header.offsetWidth;
-        let node = this.$parent.sectionTodayDone[this.meeting.meetingId]
-        let eventWidth = 100/node.processorTotal
-        let eventLeft = eventWidth * (node.processor - 1) + '%'
-        this.style = {'top': eventTop, 'height': eventHeight, 'width': eventWidth + "%", 'left': eventLeft};
+        let node = this.$parent.sectionTodayDone[this.meeting.meetingId];
+        let eventWidth = 100/node.processorTotal;
+        let eventLeft = eventWidth * (node.processor - 1) + '%';
+        this.style = {visibility: 'visible', 'top': eventTop, 'height': eventHeight, 'width': eventWidth + "%", 'left': eventLeft};
 
 
     },
     methods: {
+        hideShowMeeting: function(){
+            this.style.visibility = this.style.visibility === 'hidden' ? 'visible' : 'hidden'
+        },
         getScheduleTimestamp: function (time) {
             //accepts hh:mm format - convert hh:mm to timestamp
             time = time.replace(/ /g,'');
@@ -141,8 +233,9 @@ Vue.component('meeting', {
             return timeStamp;
         },
         meetingClick: function () {
-            this.$parent.$parent.openModal(this.courseCode)
-            this.$parent.$parent.selectedMeeting = this
+            this.$parent.$parent.openModal(this.courseCode);
+            this.$parent.$parent.modalState.selectedMeeting = this
+            this.hideShowMeeting()
         },
         removeEventSelectedClass: function () {
             this.meetingClassList.splice(this.meetingClassList.indexOf('cd-schedule__event--selected'), 1);
@@ -163,15 +256,15 @@ Vue.component('day', {
             return this.semester + "|" + this.day
         },
         sectionTodayDone: function () {
-            let meetings = []
+            let meetings = [];
             for (let i=0;i<this.sectionToday.length;i++){
                 let meeting = this.sectionToday[i];
                 meetings.push(new Node(meeting.start, meeting.end, meeting.meetingId))
             }
-            result = {}
+            result = {};
             meetings.forEach(node => {
-                node.setConflictGroup(meetings)
-                delete node.conflictGroup
+                node.setConflictGroup(meetings);
+                delete node.conflictGroup;
                 result[node.id] = node
             });
             return result
@@ -185,18 +278,33 @@ Vue.component('day', {
         "            <meeting v-for=\"meeting in sectionToday\" :meeting=\"meeting\"></meeting>" +
         "          </ul>" +
         "        </li>"
-})
+});
 
 
 var timetable = new Vue({
     el: '.single-timetable',
+    created() {
+        window.addEventListener('resize', this.handleResize);
+        this.handleResize();
+    },
+    destroyed() {
+        window.removeEventListener('resize', this.handleResize)
+    },
     data: {
         days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         daysshort: ['MO','TU','WE', "TH", "FR"],
         selections: {'VIC001Y1-Y-20199':['TUT-0101']},
-        modalClassList: ['cd-schedule-modal'],
-        selectedMeeting: undefined,
-        currentModal: {},
+        modalState: {
+            selectedMeeting: undefined,
+            currentModalEvent: {},
+            modalIsOpening: false,
+            modalIsOpened: false,
+            modalIsClosing: false,
+        },
+        window: {
+            width: 0,
+            height: 0
+        },
         courses:
             {"VIC001Y1-Y-20199": {
                     "courseTitle": "Vic One Plenary",
@@ -275,10 +383,10 @@ var timetable = new Vue({
         allSelectedCourses: function () {
             let result = {};
             for (let i=0;i<Object.keys(this.selections).length;i++){
-                let key = Object.keys(this.selections)[i]
-                let values = this.selections[key]
+                let key = Object.keys(this.selections)[i];
+                let values = this.selections[key];
                 values.forEach(value => {
-                    result[key] = this.getCourseSectionInfo(key, value)
+                    result[key] = this.getCourseSectionInfo(key, value);
                     result[key]['event'] = 'event-' + i
                 })
             }
@@ -290,7 +398,7 @@ var timetable = new Vue({
             let winter = {'MO': [], "TU": [], "WE": [], "TH": [], "FR": []};
             let result = {'fall': fall, 'winter': winter};
             for (let i=0; i<Object.keys(this.allSelectedCourses).length; i++) {
-                let courseInfo = Object.values(this.allSelectedCourses)[i]
+                let courseInfo = Object.values(this.allSelectedCourses)[i];
                 let schedule = courseInfo['meetings']['schedule'];
                 for (let j=0;j<Object.keys(schedule).length;j++) {
                     let meeting = Object.values(schedule)[j];
@@ -312,21 +420,25 @@ var timetable = new Vue({
             return result
         },
         hasSelectedMeeting: function () {
-            return this.selectedMeeting !== undefined;
+            return this.modalState.selectedMeeting !== undefined;
         }
 
     },
     methods: {
+        handleResize() {
+            this.window.width = window.innerWidth;
+            this.window.height = window.innerHeight;
+        },
         getCourseInfo: function (courseId) {
             if (this.courses[courseId]) {
                 return this.courses[courseId];
             }
-            let result_course = null
+            let result_course = null;
             Object.values(this.courses).forEach(course => {
                 if (course.code === courseId) {
                     result_course = course
                 }
-            })
+            });
             return result_course
         },
         getCourseSectionInfo: function (courseId, sectionId) {
@@ -337,24 +449,13 @@ var timetable = new Vue({
             return course
         },
         openModal: function (courseId) {
-            this.currentModal = this.getCourseInfo(courseId);
-            // cd-schedule__event--selected add when an user select the event
-            // setTimeout(this.addClassEventSelect, 10);
-            // // cd-schedule-modal--open add when event been selected
-            // this.modalClassList.push('cd-schedule-modal--open');
-            // this.modalClassList.push('cd-schedule-modal--content-loaded');
-            // this.modalClassList.push('cd-schedule-modal--animation-completed')
+            this.modalState.currentModalEvent = this.getCourseInfo(courseId);
+            this.modalIsOpening = true
         },
         closeModal: function () {
-            // this.modalClassList.splice(this.modalClassList.indexOf('cd-schedule-modal--content-loaded'), 1);
-            // this.modalClassList.splice(this.modalClassList.indexOf('cd-schedule__event--selected'), 1);
-            // this.modalClassList.splice(this.modalClassList.indexOf('cd-schedule-modal--animation-completed'), 1);
-            // this.selectedMeeting.removeEventSelectedClass()
-            this.selectedMeeting = undefined
+            this.modalState.selectedMeeting = undefined
         },
-        addClassEventSelect: function () {
-            this.selectedMeeting.meetingClassList.push('cd-schedule__event--selected');
-        }
+
     }
 });
 

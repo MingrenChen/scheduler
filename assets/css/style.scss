@@ -297,7 +297,7 @@ a {
 }
 
 .cd-schedule__event [data-event="event-0"],
-.cd-schedule-modal[data-event="event-0"] .cd-schedule-modal__header-bg {
+.cd-schedule-modal[data-event="event-0"] .cd-schedule-modal__header-bg, .cd-schedule-modal[data-event="event-0"] .cd-schedule-modal__content {
 	// this is used to set a background color for the event and the modal window
 	background: var(--cd-color-event-0);
 }
@@ -323,150 +323,192 @@ a {
 	background: var(--cd-color-event-4);
 }
 
-.cd-schedule-modal {
-	position: fixed;
-	z-index: 3;
-	top: 0;
-	right: 0;
-	height: 100%;
-	width: 100%;
-	visibility: hidden;
-	transform: translateZ(0); // Force Hardware acceleration
-
-	transform: translateX(100%);
-	transition: transform .4s, visibility .4s;
-	transition-timing-function: cubic-bezier(.5,0,.1,1);
-
-	@include breakpoint(md) {
-		// reset style
-		right: auto;
-		width: auto;
-		height: auto;
-		transform: translateX(0);
-		will-change: transform, width, height;
-		transition: height .4s, width .4s, transform .4s, visibility .4s;
-		transition-timing-function: cubic-bezier(.5,0,.1,1);
-	}
-}
 
 .cd-schedule-modal__header {
-  position: relative;
-  height: 70px;
-  display: flex;
+  padding: var(--space-sm);
   align-content: center;
-  width: 100%;
-
-  @include breakpoint(md) {
-    position: absolute;
-    display: block;
-    top: 0;
-    left: 0;
-    height: 100%;
-  }
 }
-
 .cd-schedule-modal__content {
-  position: relative;
+  position: absolute;
   z-index: 3;
   display: flex;
   align-items: center;
   padding: var(--space-sm) var(--component-padding);
-
+  top: 0;
+  left: 0;
   @include breakpoint(md) {
     // reset style
     display: block;
     padding: var(--space-sm);
   }
 }
+.cd-schedule-modal__header-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
 
 .cd-schedule-modal__body {
-  position: relative;
-  width: 100%;
-  height: calc(100% - 70px); // 70px is the .cd-schedule-modal__header height
-
-  @include breakpoint(md) {
-    height: 100%;
-    width: auto;
-  }
+  background: white;
+  width: inherit;
+  padding: var(--space-sm);
+  z-index: 3;
+  opacity: 1;
 }
 
-.cd-schedule-modal__event-info {
-  position: relative;
-  z-index: 2;
-  line-height: var(--body-line-height);
-  height: 100%;
-  overflow: hidden;
-  font-size: calc(var(--text-sm) * 1.2);
-
-  > div {
-    overflow: auto;
-    height: 100%;
-    padding: var(--space-md) var(--component-padding);
-  }
-
-  @include breakpoint(md) {
-    opacity: 0;
-    font-size: var(--text-sm);
-
-    > div {
-      padding: calc(var(--space-md)*1.3) calc(var(--space-lg)*1.2) calc(var(--space-md)*1.3) calc(var(--space-md)*1.3);
-    }
-  }
+.modal-body-enter-active, .modal-body-leave-active {
+  transition: opacity 0.2s;
+}
+.modal-body-enter, .modal-body-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 
-.cd-schedule-modal__header-bg, 
-.cd-schedule-modal__body-bg { // these are the morphing backgrounds - visible on desktop only
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  
-  @include breakpoint(md) {
-    // Force Hardware acceleration
-    transform: translateZ(0);
-    will-change: transform;
-    backface-visibility: hidden;
-  }
-}
+//.cd-schedule-modal {
+//	position: fixed;
+//	z-index: 3;
+//	top: 0;
+//	right: 0;
+//	height: 100%;
+//	width: 100%;
+//	visibility: hidden;
+//	transform: translateZ(0); // Force Hardware acceleration
+//
+//	transform: translateX(100%);
+//	transition: transform .4s, visibility .4s;
+//	transition-timing-function: cubic-bezier(.5,0,.1,1);
+//
+//	@include breakpoint(md) {
+//		// reset style
+//		right: auto;
+//		width: auto;
+//		height: auto;
+//		transform: translateX(0);
+//		will-change: transform, width, height;
+//		transition: height .4s, width .4s, transform .4s, visibility .4s;
+//		transition-timing-function: cubic-bezier(.5,0,.1,1);
+//	}
+//}
 
-.cd-schedule-modal__header-bg {
-  z-index: 2;
-  transform-origin: top center;
-  
-  @include breakpoint(md) {
-    transition: transform .4s;
-    transition-timing-function: cubic-bezier(.5,0,.1,1);
-  }
-}
+//.cd-schedule-modal__header {
+//  position: relative;
+//  height: 70px;
+//  display: flex;
+//  align-content: center;
+//  width: 100%;
+//
+//  @include breakpoint(md) {
+//    position: absolute;
+//    display: block;
+//    top: 0;
+//    left: 0;
+//    height: 100%;
+//  }
+//}
+//
+//.cd-schedule-modal__content {
+//  position: relative;
+//  z-index: 3;
+//  display: flex;
+//  align-items: center;
+//  padding: var(--space-sm) var(--component-padding);
+//
+//  @include breakpoint(md) {
+//    // reset style
+//    display: block;
+//    padding: var(--space-sm);
+//  }
+//}
 
-.cd-schedule-modal__body-bg {
-  z-index: 1;
-  background: var(--color-white);
-  transform-origin: top left;
-
-  @include breakpoint(md) {
-    opacity: 0;
-    transform: none;
-  }
-}
-
-.cd-schedule-modal--no-transition {
-  transition: none;
-
-  .cd-schedule-modal__header-bg, 
-  .cd-schedule-modal__body-bg {
-    transition: none !important;
-  }
-}
-
-.cd-schedule-modal__date {
-  display: none;
-
-  @include breakpoint(md) {
-    display: block;
-  }
-}
+//.cd-schedule-modal__body {
+//  position: relative;
+//  width: 100%;
+//  height: calc(100% - 70px); // 70px is the .cd-schedule-modal__header height
+//
+//  @include breakpoint(md) {
+//    height: 100%;
+//    width: auto;
+//  }
+//}
+//
+//.cd-schedule-modal__event-info {
+//  position: relative;
+//  z-index: 2;
+//  line-height: var(--body-line-height);
+//  height: 100%;
+//  overflow: hidden;
+//  font-size: calc(var(--text-sm) * 1.2);
+//
+//  > div {
+//    overflow: auto;
+//    height: 100%;
+//    padding: var(--space-md) var(--component-padding);
+//  }
+//
+//  @include breakpoint(md) {
+//    opacity: 0;
+//    font-size: var(--text-sm);
+//
+//    > div {
+//      padding: calc(var(--space-md)*1.3) calc(var(--space-lg)*1.2) calc(var(--space-md)*1.3) calc(var(--space-md)*1.3);
+//    }
+//  }
+//}
+//
+//.cd-schedule-modal__header-bg,
+//.cd-schedule-modal__body-bg { // these are the morphing backgrounds - visible on desktop only
+//  position: absolute;
+//  top: 0;
+//  left: 0;
+//  height: 100%;
+//  width: 100%;
+//
+//  @include breakpoint(md) {
+//    // Force Hardware acceleration
+//    transform: translateZ(0);
+//    will-change: transform;
+//    backface-visibility: hidden;
+//  }
+//}
+//
+//.cd-schedule-modal__header-bg {
+//  z-index: 2;
+//  transform-origin: top center;
+//
+//  @include breakpoint(md) {
+//    transition: transform .4s;
+//    transition-timing-function: cubic-bezier(.5,0,.1,1);
+//  }
+//}
+//
+//.cd-schedule-modal__body-bg {
+//  z-index: 1;
+//  background: var(--color-white);
+//  transform-origin: top left;
+//
+//  @include breakpoint(md) {
+//    opacity: 0;
+//    transform: none;
+//  }
+//}
+//
+//.cd-schedule-modal--no-transition {
+//  transition: none;
+//
+//  .cd-schedule-modal__header-bg,
+//  .cd-schedule-modal__body-bg {
+//    transition: none !important;
+//  }
+//}
+//
+//.cd-schedule-modal__date {
+//  display: none;
+//
+//  @include breakpoint(md) {
+//    display: block;
+//  }
+//}
 
 .cd-schedule-modal__close { // close modal icon
   position: absolute;
@@ -542,14 +584,15 @@ a {
 	height: 100%;
 	width: 100%;
 	background: alpha(var(--color-black), 0.8);
-	opacity: 0;
-	visibility: hidden;
+	opacity: 1;
 	transition: opacity .4s, visibility .4s;
 }
 
-.modal-enter-active + .cd-schedule__cover-layer {
-	opacity: 1;
-	visibility: visible;
+.cover-enter-active, .cover-leave-active {
+  transition: opacity .5s;
+}
+.cover-enter, .cover-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 
 //demo style
