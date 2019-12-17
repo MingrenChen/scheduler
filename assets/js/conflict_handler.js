@@ -1,7 +1,15 @@
-function Node(s, e, id) {
+function NodeFactory () {
+}
+
+NodeFactory.prototype.create = function(meeting, day){
+    return new Node(meeting.meetingStartTime, meeting.meetingEndTime, meeting.meetingScheduleId, day)
+};
+
+function Node(s, e, id, day) {
     this.start = getScheduleTimestamp(s);
     this.end = getScheduleTimestamp(e);
-    this.id = id
+    this.id = id;
+    this.day = day;
 }
 
 function Interval() {
@@ -13,9 +21,9 @@ Node.prototype.isConflictWith = function (other) {
         return false
     }
     // if this start before other start, and end after other start
-    if (this.start < other.start && this.end > other.start){
+    if (this.start < other.start && this.end > other.start && this.day === other.day){
         return true
-    } else if (other.start < this.start && other.end > this.start){
+    } else if (other.start < this.start && other.end > this.start && this.day === other.day){
         return true
     }
     return false
@@ -107,17 +115,45 @@ getScheduleTimestamp = function (time) {
     return timeStamp;
 }
 
-let a = new Node("10:00", "13:00", 1);
-let b = new Node("9:00", "11:00", 2);
-let c = new Node("12:00", "13:00", 3);
-let d = new Node("11:00", "15:00", 4);
-let e = new Node("17:00", "19:00", 5);
-let f = new Node("16:00", "20:00", 6);
-// let g = new Node("10:00", "13:00", 1);
+NodeFactory.prototype.setProcessorForMeetings = function (meetings) {
+    meetingNodes = []
+    nodeFactory = new NodeFactory()
+    meetings.forEach(meeting => {
+        meetingNodes.push(nodeFactory.create(meeting, meeting.meetingDay))
+    })
+    result = [];
+    meetingNodes.forEach(node => {
+        node.setConflictGroup(meetingNodes);
+        delete node.conflictGroup;
+        result.push( node)
+    });
+    result.forEach(node => {
+        let meeting = findMeetingByMeetingScheduleId(meetings, node.id)
+        meeting['processor'] = node.processor
+        meeting['processorTotal'] = node.processorTotal
+    })
+}
 
-let courses = [a,b,c,d,e,f];
-// let courses = [a,b,c,d];
-courses.forEach(node => {
-    node.setConflictGroup(courses)
-});
-// console.log(a);
+findMeetingByMeetingScheduleId = function (meetings, scheduleId) {
+    for (let i=0;i<meetings.length;i++){
+        if (meetings[i].meetingScheduleId === scheduleId){
+            return meetings[i]
+        }
+    }
+}
+
+
+// let a = new Node("10:00", "13:00", 1);
+// let b = new Node("9:00", "11:00", 2);
+// let c = new Node("12:00", "13:00", 3);
+// let d = new Node("11:00", "15:00", 4);
+// let e = new Node("17:00", "19:00", 5);
+// let f = new Node("16:00", "20:00", 6);
+// // let g = new Node("10:00", "13:00", 1);
+//
+// let courses = [a,b,c,d,e,f];
+// // let courses = [a,b,c,d];
+// courses.forEach(node => {
+//     node.setConflictGroup(courses)
+// });
+// // console.log(a);
